@@ -7,5 +7,6 @@ target 'pixster' do
 
   # Pods for pixster
   pod "AFNetworking"
-  
+  pod "MBProgressHUD"
+
 end

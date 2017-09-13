@@ -8,6 +8,8 @@
 
 import UIKit
 import AFNetworking
+import MBProgressHUD
+
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -22,7 +24,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         moviesTable.dataSource = self
         moviesTable.delegate = self
         
-
+        // Load the movies list from The Movie DB API into an array of dicitionaries
         let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")
         var request = URLRequest(url: url!)
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
@@ -32,6 +34,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             delegateQueue:OperationQueue.main
         )
         
+        // Display HUD just before the request is made
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
         let task : URLSessionDataTask = session.dataTask(with: request, completionHandler: { (dataOrNil, response, error) in
             if let data = dataOrNil {
                 
@@ -40,6 +45,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 print(dictionary)
                 self.moviesDict = dictionary["results"] as! [[String: Any]]
                 self.moviesTable.reloadData()
+                
+                // Hide HUD once the network request comes back
+                MBProgressHUD.hide(for: self.view, animated: true)
             }
         });
         task.resume()
