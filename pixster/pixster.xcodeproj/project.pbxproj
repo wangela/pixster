@@ -14,6 +14,7 @@
 		7757E0701F68B000000F1374 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7757E06E1F68B000000F1374 /* LaunchScreen.storyboard */; };
 		7757E0781F68B097000F1374 /* MoviesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7757E0771F68B097000F1374 /* MoviesViewController.swift */; };
 		7757E07A1F690297000F1374 /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7757E0791F690297000F1374 /* MovieCell.swift */; };
+		7775E8C41F691CC4001ABE6D /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7775E8C31F691CC4001ABE6D /* DetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		7757E0711F68B000000F1374 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7757E0771F68B097000F1374 /* MoviesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesViewController.swift; sourceTree = "<group>"; };
 		7757E0791F690297000F1374 /* MovieCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
+		7775E8C31F691CC4001ABE6D /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		9CB0F4BE4619E4B32820EDEE /* Pods-pixster.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pixster.debug.xcconfig"; path = "Pods/Target Support Files/Pods-pixster/Pods-pixster.debug.xcconfig"; sourceTree = "<group>"; };
 		E5C818E009D36DC70FB1C22D /* Pods_pixster.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_pixster.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -78,6 +80,7 @@
 				7757E06E1F68B000000F1374 /* LaunchScreen.storyboard */,
 				7757E0711F68B000000F1374 /* Info.plist */,
 				7757E0771F68B097000F1374 /* MoviesViewController.swift */,
+				7775E8C31F691CC4001ABE6D /* DetailViewController.swift */,
 			);
 			path = pixster;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 			files = (
 				7757E0661F68B000000F1374 /* AppDelegate.swift in Sources */,
 				7757E0781F68B097000F1374 /* MoviesViewController.swift in Sources */,
+				7775E8C41F691CC4001ABE6D /* DetailViewController.swift in Sources */,
 				7757E07A1F690297000F1374 /* MovieCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -389,6 +393,7 @@
 				7757E0761F68B000000F1374 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
