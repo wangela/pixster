@@ -51,6 +51,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             }
         });
         task.resume()
+        
+        // Initialize a UIRefreshControl
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
+        // Add refresh control to the table view
+        moviesTable.insertSubview(refreshControl, at: 0)
     }
  
     override func didReceiveMemoryWarning() {
@@ -85,7 +91,31 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
 
-
+    // Makes a netwwork request to get updated data
+    // Updates the tableView with the new data
+    // Hides the RefreshControl
+    func refreshControlAction(_ refreshControl: UIRefreshControl) {
+        
+        // ... Create the URLRequset 'myRequest' ...
+        
+        // Configure the session so that completion handler is executed on main UI thread
+        let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")
+        var request = URLRequest(url: url!)
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+        let task: URLSessionTask = session.dataTask(with: request) {
+            (data: Data?, response: URLResponse?, error: Error?) in
+            
+            // ... User the new data to update the data source ...
+            
+            // Reload the tableView now that there is new data
+            self.moviesTable.reloadData()
+            
+            // Tell the refreshControl to stop spinning
+            refreshControl.endRefreshing()
+        }
+        task.resume()
+    }
 
     // MARK: - Navigation
 
