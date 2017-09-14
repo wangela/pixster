@@ -14,6 +14,7 @@ import MBProgressHUD
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var moviesTable: UITableView!
+    @IBOutlet weak var errorView: UIView!
     
     var moviesDict: [[String: Any]] = [[String: Any]]()
     
@@ -23,6 +24,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Do any additional setup after loading the view.
         moviesTable.dataSource = self
         moviesTable.delegate = self
+        errorView.isHidden = true
         
         // Load the movies list from The Movie DB API into an array of dicitionaries
         let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")
@@ -38,16 +40,26 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         MBProgressHUD.showAdded(to: self.view, animated: true)
         
         let task : URLSessionDataTask = session.dataTask(with: request, completionHandler: { (dataOrNil, response, error) in
-            if let data = dataOrNil {
+            if error != nil {
+                // Display error view
+                self.errorView.isHidden = false
+                print("Load network error")
                 
-                let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String:Any]
-                
-                print(dictionary)
-                self.moviesDict = dictionary["results"] as! [[String: Any]]
-                self.moviesTable.reloadData()
-                
-                // Hide HUD once the network request comes back
+                // Hide HUD to allow refresh
                 MBProgressHUD.hide(for: self.view, animated: true)
+            } else {
+                self.errorView.isHidden = true
+                if let data = dataOrNil {
+                    
+                    let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String:Any]
+                    
+                    print(dictionary)
+                    self.moviesDict = dictionary["results"] as! [[String: Any]]
+                    self.moviesTable.reloadData()
+                    
+                    // Hide HUD once the network request comes back
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                }
             }
         });
         task.resume()
@@ -96,23 +108,46 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // Hides the RefreshControl
     func refreshControlAction(_ refreshControl: UIRefreshControl) {
         
-        // ... Create the URLRequset 'myRequest' ...
-        
         // Configure the session so that completion handler is executed on main UI thread
         let url = URL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")
-        var request = URLRequest(url: url!)
-        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        var myRequest = URLRequest(url: url!)
+        myRequest.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-        let task: URLSessionTask = session.dataTask(with: request) {
+        
+        // Display HUD just before the request is made
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
+        let task: URLSessionTask = session.dataTask(with: myRequest) {
             (data: Data?, response: URLResponse?, error: Error?) in
-            
-            // ... User the new data to update the data source ...
-            
-            // Reload the tableView now that there is new data
-            self.moviesTable.reloadData()
-            
-            // Tell the refreshControl to stop spinning
-            refreshControl.endRefreshing()
+            if error != nil {
+                // Display error view
+                self.errorView.isHidden = false
+                print("Refresh network error")
+                
+                // Hide HUD to allow another refresh
+                MBProgressHUD.hide(for: self.view, animated: true)
+                refreshControl.endRefreshing()
+            } else {
+                // ... Use the new data to update the data source ...
+                self.errorView.isHidden = true
+                if let newData = data {
+                    
+                    let dictionary = try! JSONSerialization.jsonObject(with: newData, options: []) as! [String:Any]
+                    
+                    print(dictionary)
+                    self.moviesDict = dictionary["results"] as! [[String: Any]]
+                    
+                    // Reload the tableView now that there is new data
+                    self.moviesTable.reloadData()
+                    
+                    // Tell the refreshControl to stop spinning
+                    refreshControl.endRefreshing()
+                    
+                    // Hide HUD once the network request comes back
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                }
+            }
+
         }
         task.resume()
     }
