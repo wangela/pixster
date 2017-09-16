@@ -16,15 +16,21 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var infoView: UIView!
     
+    var type: String!
     var movie: [String: Any]!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
 
         // Do any additional setup after loading the view.
-        let title = movie["title"] as? String
+        var title: String
+        if type == "movie" {
+            title = (movie["title"] as? String)!
+        } else {
+            title = (movie["name"] as? String)!
+        }
         let storyline = movie["overview"] as? String
         if let posterPath = movie["poster_path"] as? String {
             let posterBaseUrl = "http://image.tmdb.org/t/p/original"

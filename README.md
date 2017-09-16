@@ -2,7 +2,7 @@
 
 pixster is an iOS app for browsing movies using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: 4.25 hours spent in total
+Time spent: 5.75 hours spent in total
 
 ## User Stories
 
@@ -16,7 +16,7 @@ The following **required** functionality is completed:
 
 The following **optional** features are implemented:
 
-- [ ] Add a tab bar for **Now Playing** and **Top Rated** movies.
+- [x] Add a tab bar for **Now Playing** movies and **Popular Shows** for TV.
 - [ ] Implement segmented control to switch between list view and grid view.
 - [ ] Add a search bar.
 - [ ] All images fade in.
@@ -26,7 +26,7 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-- [ ] TBD
+- [x] Handle TV shows in addition to movies
 
 ## Video Walkthrough
 
@@ -41,6 +41,9 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 When creating the movie details view controller, I made the VC class a UICollectionViewController instead of a UIViewController and had runtime issues. Now I know these are two different things.
 
 ## License
+Graphics credits:
+- "tickets" by Daouna Jeong from [the Noun Project](https://thenounproject.com)
+- "TV" by Manasa from [the Noun Project](https://thenounproject.com)
 
   MIT License
 
