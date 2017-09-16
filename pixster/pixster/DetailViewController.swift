@@ -21,7 +21,7 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.navigationController?.view.frame = CGRect(x: 0, y: -10, width: (navigationController?.view.bounds.width)!, height: (navigationController?.view.bounds.height)!)
         scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
 
         // Do any additional setup after loading the view.
@@ -47,13 +47,6 @@ class DetailViewController: UIViewController {
         storylineLabel.text = storyline
         storylineLabel.sizeToFit()
         self.title = title
-        
-        let barButton = UIBarButtonItem(title: "< Back", style: .plain, target: self, action: nil)
-        barButton.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin)], for: UIControlState.normal)
-        print (barButton.title!)
-        self.navigationItem.backBarButtonItem = barButton
-        print (self.navigationItem.backBarButtonItem?.title)
-        // self.navigationItem.backBarButtonItem.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin)], for: UIControlState.normal)
     }
 
     override func didReceiveMemoryWarning() {

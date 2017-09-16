@@ -25,7 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         nowPlayingViewController.navTitle = "Now Playing"
         nowPlayingNavigationController.tabBarItem.title = "Now Playing"
         nowPlayingNavigationController.tabBarItem.image = UIImage(named: "tickets")
-        nowPlayingNavigationController.navigationBar.frame = CGRect(x: 0, y: 0, width: nowPlayingNavigationController.navigationBar.bounds.width, height: nowPlayingNavigationController.navigationBar.bounds.height - 20)
         nowPlayingNavigationController.navigationBar.isTranslucent = false
         nowPlayingNavigationController.navigationBar.backgroundColor = UIColor.white
         nowPlayingNavigationController.navigationBar.titleTextAttributes = [
@@ -39,7 +38,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         popularTvViewController.navTitle = "Popular Shows"
         popularTvNavigationController.tabBarItem.title = "Popular Shows"
         popularTvNavigationController.tabBarItem.image = UIImage(named: "tv")
-        popularTvNavigationController.navigationBar.frame = CGRect(x: 0, y: 0, width: popularTvNavigationController.navigationBar.bounds.width, height: popularTvNavigationController.navigationBar.bounds.height - 20)
         popularTvNavigationController.navigationBar.isTranslucent = false
         popularTvNavigationController.navigationBar.backgroundColor = UIColor.white
         popularTvNavigationController.navigationBar.titleTextAttributes = [
@@ -49,9 +47,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [nowPlayingNavigationController, popularTvNavigationController]
+        tabBarController.tabBar.tintColor = UIColor.red
+        // tabBarController.tabBar.isOpaque = true
+        // tabBarController.tabBar.barTintColor = UIColor.black
+        tabBarController.tabBar.barStyle = UIBarStyle.black
         
-        UITabBar.appearance().backgroundColor = UIColor.black
-
+        // UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.classForCoder() as! UIAppearanceContainer.Type]).setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin)], for: .normal)
+        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.classForCoder() as! UIAppearanceContainer.Type]).setBackButtonTitlePositionAdjustment(UIOffsetMake(0, -80.0), for: .default)
+        
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
         

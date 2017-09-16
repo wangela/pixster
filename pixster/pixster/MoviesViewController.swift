@@ -11,31 +11,63 @@ import AFNetworking
 import MBProgressHUD
 
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
 
     @IBOutlet weak var moviesTable: UITableView!
+    @IBOutlet weak var moviesCollection: UICollectionView!
     @IBOutlet weak var errorView: UIView!
+    @IBOutlet weak var layoutControl: UISegmentedControl!
+    
+    let defaults = UserDefaults.standard
     
     var moviesDict: [[String: Any]] = [[String: Any]]()
     var refreshControl = UIRefreshControl()
     var endpoint: String?
     var navTitle: String?
     
+    func isKeyPresentInUserDefaults(key: String) -> Bool {
+        return UserDefaults.standard.object(forKey: key) != nil
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.view.frame = CGRect(x: 0, y: -10, width: (navigationController?.view.bounds.width)!, height: (navigationController?.view.bounds.height)!)
+
 
         // Do any additional setup after loading the view.
         self.title = navTitle
         moviesTable.dataSource = self
         moviesTable.delegate = self
+        moviesCollection.dataSource = self
+        moviesCollection.delegate = self
+        moviesCollection.isHidden = true
         errorView.isHidden = true
+        
+        if !isKeyPresentInUserDefaults(key: "viewPref") {
+            defaults.set(0, forKey: "viewPref")
+            defaults.synchronize()
+        }
+        layoutControl.selectedSegmentIndex = defaults.integer(forKey: "viewPref")
+        layoutControl.tintColor = UIColor.red
+        layoutChange()
+        
+        moviesCollection.collectionViewLayout.prepare()
         
         // Initialize a UIRefreshControl
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
         // Add refresh control to the table view
         moviesTable.insertSubview(refreshControl, at: 0)
         
+        layoutControl.addTarget(self, action: #selector(layoutChangeAction(_:)), for: .valueChanged)
+
         networkRequest(endpoint: endpoint!)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.view.frame = CGRect(x: 0, y: -10, width: (navigationController?.view.bounds.width)!, height: (navigationController?.view.bounds.height)!)
+        layoutControl.selectedSegmentIndex = defaults.integer(forKey: "viewPref")
+        layoutChange()
     }
  
     override func didReceiveMemoryWarning() {
@@ -75,6 +107,38 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return moviesDict.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GridCell", for: indexPath) as! MovieCollectionViewCell
+        let movie = moviesDict[indexPath.row]
+        var title: String
+        if endpoint == "movie/now_playing" {
+            title = (movie["title"] as? String)!
+        } else {
+            title = (movie["name"] as? String)!
+        }
+        
+        if let posterPath = movie["poster_path"] as? String {
+            let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
+            let posterUrl = URL(string: posterBaseUrl + posterPath)
+            cell.posterView.setImageWith(posterUrl!)
+        }
+        else {
+            // No poster image. Can either set to nil (no image) or a default movie poster image
+            // that you include as an asset
+            cell.posterView.image = nil
+        }
+        
+        cell.titleLabel.text = title
+        
+        return cell
+
+    }
+    
     func networkRequest(endpoint: String) {
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = URL(string:"https://api.themoviedb.org/3/\(endpoint)?api_key=\(apiKey)")
@@ -106,6 +170,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     print(dictionary)
                     self.moviesDict = dictionary["results"] as! [[String: Any]]
                     self.moviesTable.reloadData()
+                    self.moviesCollection.reloadData()
                     self.refreshControl.endRefreshing()
                     
                     // Hide HUD once the network request comes back
@@ -121,27 +186,63 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         networkRequest(endpoint: endpoint!)
 
     }
+    
+    func layoutChange() {
+        if layoutControl.selectedSegmentIndex == 0 {
+            // List view chosen
+            moviesTable.isHidden = false
+            moviesCollection.isHidden = true
+            defaults.set(0, forKey: "viewPref")
+            defaults.synchronize()
+        } else {
+            // Grid view chosen
+            moviesCollection.isHidden = false
+            moviesTable.isHidden = true
+            defaults.set(1, forKey: "viewPref")
+            defaults.synchronize()
+        }
+    }
+    
+    @IBAction func layoutChangeAction(_ sender: UISegmentedControl) {
+        layoutChange()
+    }
+
 
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-        let cell = sender as! UITableViewCell
-        let indexPath = moviesTable.indexPath(for: cell)
-        let movie = moviesDict[indexPath!.row]
-        print (movie)
-        
-        var endpointType: String
-        if endpoint!.hasPrefix("movie") {
-            endpointType = "movie"
-        } else {
-            endpointType = "tv"
+        if segue.identifier == "grid" {
+            let cell = sender as! MovieCollectionViewCell
+            let indexPath = moviesCollection.indexPath(for: cell)
+            let movie = moviesDict[indexPath!.item]
+            print (movie)
+            
+            var endpointType: String
+            if endpoint!.hasPrefix("movie") {
+                endpointType = "movie"
+            } else {
+                endpointType = "tv"
+            }
+            let detailViewController = segue.destination as! DetailViewController
+            detailViewController.movie = movie
+            detailViewController.type = endpointType
+        } else if segue.identifier == "list" {
+            let cell = sender as! MovieCell
+            let indexPath = moviesTable.indexPath(for: cell)
+            let movie = moviesDict[(indexPath?.row)!]
+            print (movie)
+            
+            var endpointType: String
+            if endpoint!.hasPrefix("movie") {
+                endpointType = "movie"
+            } else {
+                endpointType = "tv"
+            }
+            let detailViewController = segue.destination as! DetailViewController
+            detailViewController.movie = movie
+            detailViewController.type = endpointType
         }
-        let detailViewController = segue.destination as! DetailViewController
-        detailViewController.movie = movie
-        detailViewController.type = endpointType
     }
 
 }

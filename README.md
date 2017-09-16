@@ -2,7 +2,7 @@
 
 pixster is an iOS app for browsing movies using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: 5.75 hours spent in total
+Time spent: 8.75 hours spent in total
 
 ## User Stories
 
@@ -17,16 +17,18 @@ The following **required** functionality is completed:
 The following **optional** features are implemented:
 
 - [x] Add a tab bar for **Now Playing** movies and **Popular Shows** for TV.
-- [ ] Implement segmented control to switch between list view and grid view.
+- [x] Implement segmented control to switch between list view and grid view.
 - [ ] Add a search bar.
 - [ ] All images fade in.
 - [ ] For the large poster, load the low-res image first, switch to high-res when complete.
 - [ ] Customize the highlight and selection effect of the cell.
-- [ ] Customize the navigation bar.
+- [x] Customize the navigation bar.
 
 The following **additional** features are implemented:
 
 - [x] Handle TV shows in addition to movies
+- [x] Remember user preference for list view or grid view across tabs and across app restarts
+- [x] Customize the tab bar
 
 ## Video Walkthrough
 
@@ -44,6 +46,7 @@ When creating the movie details view controller, I made the VC class a UICollect
 Graphics credits:
 - "tickets" by Daouna Jeong from [the Noun Project](https://thenounproject.com)
 - "TV" by Manasa from [the Noun Project](https://thenounproject.com)
+- "list" by unlimicon from [the Noun Project](https://thenounproject.com)
 
   MIT License
 
