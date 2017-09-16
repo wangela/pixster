@@ -47,6 +47,13 @@ class DetailViewController: UIViewController {
         storylineLabel.text = storyline
         storylineLabel.sizeToFit()
         self.title = title
+        
+        let barButton = UIBarButtonItem(title: "< Back", style: .plain, target: self, action: nil)
+        barButton.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin)], for: UIControlState.normal)
+        print (barButton.title!)
+        self.navigationItem.backBarButtonItem = barButton
+        print (self.navigationItem.backBarButtonItem?.title)
+        // self.navigationItem.backBarButtonItem.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin)], for: UIControlState.normal)
     }
 
     override func didReceiveMemoryWarning() {
