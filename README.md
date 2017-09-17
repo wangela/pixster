@@ -2,7 +2,7 @@
 
 pixster is an iOS app for browsing movies using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: 8.75 hours spent in total
+Time spent: 12.75 hours spent in total
 
 ## User Stories
 
@@ -19,9 +19,9 @@ The following **optional** features are implemented:
 - [x] Add a tab bar for **Now Playing** movies and **Popular Shows** for TV.
 - [x] Implement segmented control to switch between list view and grid view.
 - [ ] Add a search bar.
-- [ ] All images fade in.
+- [x] All images fade in.
 - [ ] For the large poster, load the low-res image first, switch to high-res when complete.
-- [ ] Customize the highlight and selection effect of the cell.
+- [x] Customize the highlight and selection effect of the cell.
 - [x] Customize the navigation bar.
 
 The following **additional** features are implemented:
@@ -29,12 +29,14 @@ The following **additional** features are implemented:
 - [x] Handle TV shows in addition to movies
 - [x] Remember user preference for list view or grid view across tabs and across app restarts
 - [x] Customize the tab bar
+- [x] Grid view displays 3 columns of full-fill posters
+- [x] Animate entrance of details on details screen
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='anim_pixster_v2.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -42,11 +44,14 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 When creating the movie details view controller, I made the VC class a UICollectionViewController instead of a UIViewController and had runtime issues. Now I know these are two different things.
 
+I wanted to make the table cells pretty and responsive on all device sizes but I think it will be more efficient to use next week's lesson in AutoLayout to accomplish this.
+
 ## License
 Graphics credits:
 - "tickets" by Daouna Jeong from [the Noun Project](https://thenounproject.com)
 - "TV" by Manasa from [the Noun Project](https://thenounproject.com)
 - "list" by unlimicon from [the Noun Project](https://thenounproject.com)
+- "grid" by O s t r e a from [the Noun Project](https://thenounproject.com)
 
   MIT License
 

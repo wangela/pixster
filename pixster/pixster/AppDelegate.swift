@@ -22,38 +22,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let nowPlayingNavigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
         let nowPlayingViewController =  nowPlayingNavigationController.topViewController as! MoviesViewController
         nowPlayingViewController.endpoint = "movie/now_playing"
-        nowPlayingViewController.navTitle = "Now Playing"
+        nowPlayingViewController.navTitle = "New Movies"
         nowPlayingNavigationController.tabBarItem.title = "Now Playing"
         nowPlayingNavigationController.tabBarItem.image = UIImage(named: "tickets")
-        nowPlayingNavigationController.navigationBar.isTranslucent = false
-        nowPlayingNavigationController.navigationBar.backgroundColor = UIColor.white
-        nowPlayingNavigationController.navigationBar.titleTextAttributes = [
-            NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin),
-            NSForegroundColorAttributeName: UIColor.red
-        ]
         
         let popularTvNavigationController = storyboard.instantiateViewController(withIdentifier: "MoviesNavigationController") as! UINavigationController
         let popularTvViewController =  popularTvNavigationController.topViewController as! MoviesViewController
         popularTvViewController.endpoint = "tv/popular"
-        popularTvViewController.navTitle = "Popular Shows"
+        popularTvViewController.navTitle = "Hot TV Shows"
         popularTvNavigationController.tabBarItem.title = "Popular Shows"
         popularTvNavigationController.tabBarItem.image = UIImage(named: "tv")
-        popularTvNavigationController.navigationBar.isTranslucent = false
-        popularTvNavigationController.navigationBar.backgroundColor = UIColor.white
-        popularTvNavigationController.navigationBar.titleTextAttributes = [
-            NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin),
-            NSForegroundColorAttributeName: UIColor.red
-        ]
         
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [nowPlayingNavigationController, popularTvNavigationController]
-        tabBarController.tabBar.tintColor = UIColor.red
-        // tabBarController.tabBar.isOpaque = true
-        // tabBarController.tabBar.barTintColor = UIColor.black
+        tabBarController.tabBar.tintColor = UIColor(red: 255.0/255.0, green: 212.0/255.0, blue: 13.0/255.0, alpha: 1.0)
         tabBarController.tabBar.barStyle = UIBarStyle.black
         
-        // UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.classForCoder() as! UIAppearanceContainer.Type]).setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin)], for: .normal)
-        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.classForCoder() as! UIAppearanceContainer.Type]).setBackButtonTitlePositionAdjustment(UIOffsetMake(0, -80.0), for: .default)
+        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.classForCoder() as! UIAppearanceContainer.Type]).setBackButtonTitlePositionAdjustment(UIOffsetMake(0, -80), for: .default)
         
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()

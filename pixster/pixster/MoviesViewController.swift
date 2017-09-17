@@ -22,6 +22,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     var moviesDict: [[String: Any]] = [[String: Any]]()
     var refreshControl = UIRefreshControl()
+    var refreshCollectionControl = UIRefreshControl()
     var endpoint: String?
     var navTitle: String?
     
@@ -31,10 +32,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.view.frame = CGRect(x: 0, y: -10, width: (navigationController?.view.bounds.width)!, height: (navigationController?.view.bounds.height)!)
-
-
-        // Do any additional setup after loading the view.
+        
+        // Data setups
         self.title = navTitle
         moviesTable.dataSource = self
         moviesTable.delegate = self
@@ -43,31 +42,61 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         moviesCollection.isHidden = true
         errorView.isHidden = true
         
+        // Customize navigation bar, including list vs grid preference
+        if let navigationBar = navigationController?.navigationBar {
+            navigationBar.isTranslucent = false
+            navigationBar.barStyle = UIBarStyle.black
+            navigationBar.titleTextAttributes = [
+                NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightThin),
+                NSForegroundColorAttributeName: UIColor(red: 255.0/255.0, green: 212.0/255.0, blue: 13.0/255.0, alpha: 1.0)
+            ]
+        }
         if !isKeyPresentInUserDefaults(key: "viewPref") {
             defaults.set(0, forKey: "viewPref")
             defaults.synchronize()
         }
         layoutControl.selectedSegmentIndex = defaults.integer(forKey: "viewPref")
-        layoutControl.tintColor = UIColor.red
-        layoutChange()
-        
-        moviesCollection.collectionViewLayout.prepare()
-        
-        // Initialize a UIRefreshControl
-        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
-        // Add refresh control to the table view
-        moviesTable.insertSubview(refreshControl, at: 0)
-        
+        layoutControl.tintColor = UIColor(red: 255.0/255.0, green: 212.0/255.0, blue: 13.0/255.0, alpha: 1.0)
+        layoutControl.sizeToFit()
         layoutControl.addTarget(self, action: #selector(layoutChangeAction(_:)), for: .valueChanged)
+        layoutChange()
+        let layoutButton = UIBarButtonItem(customView: layoutControl)
+        navigationItem.rightBarButtonItem = layoutButton
+        self.edgesForExtendedLayout = [UIRectEdge.all]
+        
+        // Set size of TableView and CollectionView
+        moviesCollection.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        moviesTable.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
 
+        // Calculate cell size to make collection lay out in 3 columns
+        let posterwidth = (moviesCollection.frame.width / 3) - 4
+        let posterheight = (posterwidth * 1.5) + 30
+        let cellSize = CGSize(width: posterwidth, height: posterheight)
+        
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.itemSize = cellSize
+        layout.sectionInset = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
+        layout.minimumLineSpacing = 1.0
+        layout.minimumInteritemSpacing = 1.0
+        
+        moviesCollection.setCollectionViewLayout(layout, animated: true)
+        moviesCollection.reloadData()
+        
+        // Initialize a UIRefreshControls for both tableview and collectionview
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
+        refreshCollectionControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
+        moviesTable.insertSubview(refreshControl, at: 0)
+        moviesCollection.insertSubview(refreshCollectionControl, at: 0)
+        
         networkRequest(endpoint: endpoint!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.view.frame = CGRect(x: 0, y: -10, width: (navigationController?.view.bounds.width)!, height: (navigationController?.view.bounds.height)!)
         layoutControl.selectedSegmentIndex = defaults.integer(forKey: "viewPref")
         layoutChange()
+        self.title = navTitle
     }
  
     override func didReceiveMemoryWarning() {
@@ -85,7 +114,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         var title: String
         if endpoint == "movie/now_playing" {
             title = (movie["title"] as? String)!
-        } else {
+        } else { // this is a TV show
             title = (movie["name"] as? String)!
         }
         
@@ -93,7 +122,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         if let posterPath = movie["poster_path"] as? String {
             let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
             let posterUrl = URL(string: posterBaseUrl + posterPath)
-            cell.posterView.setImageWith(posterUrl!)
+            cell.loadImage(imageVue: cell.posterView, imageUrl: posterUrl!)
         }
         else {
             // No poster image. Can either set to nil (no image) or a default movie poster image
@@ -101,13 +130,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             cell.posterView.image = nil
         }
         
+        // Customize selected behavior for tableview
+        let bgColorView = UIView()
+        bgColorView.backgroundColor = UIColor.darkGray
+        cell.selectedBackgroundView = bgColorView
+
         cell.titleLabel.text = title
         cell.storylineLabel.text = storyline
         
         return cell
     }
-    
-    
+
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return moviesDict.count
     }
@@ -122,10 +156,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             title = (movie["name"] as? String)!
         }
         
+        // Fill the cell with the poster image
+        cell.posterView.frame = CGRect(x:0, y:0, width: cell.frame.width, height: cell.frame.height - 30)
         if let posterPath = movie["poster_path"] as? String {
             let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
             let posterUrl = URL(string: posterBaseUrl + posterPath)
-            cell.posterView.setImageWith(posterUrl!)
+            cell.loadImage(imageVue: cell.posterView, imageUrl: posterUrl!)
         }
         else {
             // No poster image. Can either set to nil (no image) or a default movie poster image
@@ -133,10 +169,22 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             cell.posterView.image = nil
         }
         
+        cell.titleLabel.frame = CGRect(x:0, y: cell.frame.height - 28, width: cell.frame.width, height: 28)
         cell.titleLabel.text = title
         
         return cell
 
+    }
+    
+    // Customize selected behavior for collectionview
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = moviesCollection.cellForItem(at: indexPath) as! MovieCollectionViewCell
+        cell.backgroundColor = UIColor.darkGray
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        let cell = moviesCollection.cellForItem(at: indexPath) as! MovieCollectionViewCell
+        cell.backgroundColor = UIColor.black
     }
     
     func networkRequest(endpoint: String) {
@@ -157,7 +205,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if error != nil {
                 // Display error view
                 self.errorView.isHidden = false
-                print("Load network error")
+                self.refreshControl.endRefreshing()
+                self.refreshCollectionControl.endRefreshing()
                 
                 // Hide HUD to allow refresh
                 MBProgressHUD.hide(for: self.view, animated: true)
@@ -167,11 +216,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     
                     let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String:Any]
                     
-                    print(dictionary)
                     self.moviesDict = dictionary["results"] as! [[String: Any]]
                     self.moviesTable.reloadData()
                     self.moviesCollection.reloadData()
                     self.refreshControl.endRefreshing()
+                    self.refreshCollectionControl.endRefreshing()
                     
                     // Hide HUD once the network request comes back
                     MBProgressHUD.hide(for: self.view, animated: true)
@@ -179,8 +228,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             }
         });
         task.resume()
+        
     }
-
+    
     func refreshControlAction(_ refreshControl: UIRefreshControl) {
         
         networkRequest(endpoint: endpoint!)
@@ -215,8 +265,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         if segue.identifier == "grid" {
             let cell = sender as! MovieCollectionViewCell
             let indexPath = moviesCollection.indexPath(for: cell)
-            let movie = moviesDict[indexPath!.item]
-            print (movie)
+            let video = moviesDict[indexPath!.item]
             
             var endpointType: String
             if endpoint!.hasPrefix("movie") {
@@ -225,13 +274,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 endpointType = "tv"
             }
             let detailViewController = segue.destination as! DetailViewController
-            detailViewController.movie = movie
+            detailViewController.video = video
             detailViewController.type = endpointType
         } else if segue.identifier == "list" {
             let cell = sender as! MovieCell
             let indexPath = moviesTable.indexPath(for: cell)
-            let movie = moviesDict[(indexPath?.row)!]
-            print (movie)
+            let video = moviesDict[(indexPath?.row)!]
             
             var endpointType: String
             if endpoint!.hasPrefix("movie") {
@@ -240,7 +288,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 endpointType = "tv"
             }
             let detailViewController = segue.destination as! DetailViewController
-            detailViewController.movie = movie
+            detailViewController.video = video
             detailViewController.type = endpointType
         }
     }
